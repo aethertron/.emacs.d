@@ -1,0 +1,1 @@
+improved emacs config that allows for heavy and light operation

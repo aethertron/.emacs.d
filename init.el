@@ -29,7 +29,10 @@ There are two things you can do about this warning:
  ;; If there is more than one, they won't work right.
  )
 
+;; important state
 (setq emacs-heavy (if (string= (getenv "EMACS_HEAVY") "") nil 1))
+(defconst temp-dir (expand-file-name "cache" user-emacs-directory) "Hostname-based elisp temp directories")
+
 (global-set-key (kbd "M-k") #'backward-kill-word)
 (global-set-key (kbd "C-c s") #'sort-lines)
 
@@ -51,6 +54,21 @@ There are two things you can do about this warning:
   (global-set-key (kbd "C-c k") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
   (global-set-key (kbd "C-c m") 'man))
+
+(progn
+  ;; backups in autosave dir
+  (setq
+   history-length                     1000
+   backup-inhibited                   nil
+   make-backup-files                  t
+   auto-save-default                  t
+   auto-save-list-file-name           (expand-file-name "autosave" temp-dir)
+   make-backup-files                  t
+   create-lockfiles                   nil
+   backup-directory-alist            `((".*" . ,(concat temp-dir "/backup/")))
+   auto-save-file-name-transforms    `((".*" ,(concat temp-dir "/auto-save-list/") t)))
+  (unless (file-exists-p (expand-file-name "auto-save-list" temp-dir))
+    (make-directory (expand-file-name "auto-save-list" temp-dir) 1)))
 
 ;; Heavy Duty
 
