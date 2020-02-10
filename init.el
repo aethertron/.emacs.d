@@ -29,49 +29,57 @@ There are two things you can do about this warning:
  ;; If there is more than one, they won't work right.
  )
 
-;; important state
+;; Important variables
 (setq emacs-heavy (if (string= (getenv "EMACS_HEAVY") "") nil 1))
 (defconst temp-dir (expand-file-name "cache" user-emacs-directory) "Hostname-based elisp temp directories")
 
+;; General keybinding configuration
 (global-set-key (kbd "M-k") #'backward-kill-word)
 (global-set-key (kbd "C-c s") #'sort-lines)
+;; turn off suspend mode
+(global-unset-key (kbd "C-z"))
+(global-set-key (kbd "C-c m") 'man)
 
+;; Configure line wrap toggling
 (progn 
   (setq-default truncate-lines t)
   (setq truncate-partial-width-windows 20)
   (global-set-key (kbd "C-c r") #'visual-line-mode))
 
+;; Configure graphical elements
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+;; Configure Lightweight Packages
+;; ------------------------------
+;; Configure multiple-cursors
 (progn
   (require 'multiple-cursors)
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c j") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-c k") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-  (global-set-key (kbd "C-c m") 'man))
+  ;; mc bindings that work in TTY
+  (global-set-key (kbd "C-c j") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-c k") 'mc/mark-previous-like-this))
 
 (progn
-  ;; backups in autosave dir
+  ;; Backups in autosave dir
   (setq
    history-length                     1000
    backup-inhibited                   nil
    make-backup-files                  t
    auto-save-default                  t
    auto-save-list-file-name           (expand-file-name "autosave" temp-dir)
-   make-backup-files                  t
    create-lockfiles                   nil
    backup-directory-alist            `((".*" . ,(concat temp-dir "/backup/")))
    auto-save-file-name-transforms    `((".*" ,(concat temp-dir "/auto-save-list/") t)))
   (unless (file-exists-p (expand-file-name "auto-save-list" temp-dir))
     (make-directory (expand-file-name "auto-save-list" temp-dir) 1)))
 
-;; Heavy Duty
-
+;; Heavy duty
+;; ----------
 (if emacs-heavy
     (progn
       (server-start)
